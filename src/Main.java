@@ -1,21 +1,18 @@
 public class Main {
     public static void main(String[] args) {
-        // Get the Singleton instance
-        GameBoard board1 = GameBoard.getInstance();
-        GameBoard board2 = GameBoard.getInstance();
+        GameBoard board = GameBoard.getInstance();
 
-        // Test if both instances are the same
-        System.out.println(board1 == board2); // Should print true
+        // Create and register an observer
+        Observer consoleObserver = new ConsoleObserver();
+        board.addObserver(consoleObserver);
 
-        // Print the initial board
-        board1.printBoard();
+        // Perform some actions
+        board.placePiece(0, 0, new GamePiece("King"));
+        board.placePiece(7, 7, new GamePiece("Queen"));
+        board.removePiece(0, 0);
 
-        // Update a tile and print the board again
-        board1.updateTile(0, 0, "X");
-        board1.printBoard();
-
-        // Access the same instance through board2
-        board2.updateTile(7, 7, "O");
-        board2.printBoard();
+        // Print the board
+        System.out.println("\nFinal Board:");
+        board.printBoard();
     }
 }
