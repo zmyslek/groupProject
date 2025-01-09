@@ -29,6 +29,11 @@ public class GameBoard {
         // Setup queens
         setPiece(new Position(3, 0), GamePieceFactory.createPiece("queen", Player.WHITE));
         setPiece(new Position(3, 7), GamePieceFactory.createPiece("queen", Player.BLACK));
+
+        for(int i = 0; i < 8; i++) {
+            setPiece(new Position(i, 1), GamePieceFactory.createPiece("pawn", Player.WHITE));  // White pawns
+            setPiece(new Position(i, 6), GamePieceFactory.createPiece("pawn", Player.BLACK));  // Black pawns
+        }
     }
 
     public GamePiece getPiece(Position pos) {

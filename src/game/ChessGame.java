@@ -18,25 +18,76 @@ public class ChessGame {
         this.board = new GameBoard();
         this.commandHistory = new CommandHistory();
         this.currentPlayer = Player.WHITE;
+        System.out.println("Chess game started!");
+        printBoard();
     }
 
-    public void handleMove(String input) {
+    public void handleMove(String input, boolean forceMode) {
         try {
+            System.out.println("\nAttempting move: " + input);
+            System.out.println("Current player: " + currentPlayer);
+
             MoveInput moveInput = new ConsoleInputAdapter(input);
             Position from = moveInput.getFrom();
             Position to = moveInput.getTo();
 
-            if (!isValidMove(from, to)) {
-                throw new IllegalArgumentException("Invalid move");
+            if (!isValidMove(from, to, forceMode)) {
+                throw new IllegalArgumentException("Invalid move: " + input);
             }
 
             MoveCommand moveCommand = new MoveCommand(board, from, to);
             commandHistory.execute(moveCommand);
-            switchPlayer();
+            if (!forceMode) {
+                switchPlayer();
+            }
+            System.out.println("Move successful!");
+            printBoard();
 
         } catch (Exception e) {
             System.err.println("Error: " + e.getMessage());
         }
+    }
+
+    private boolean isValidMove(Position from, Position to, boolean forceMode) {
+        if (!board.isValidPosition(from) || !board.isValidPosition(to)) {
+            return false;
+        }
+
+        GamePiece piece = board.getPiece(from);
+        if (piece == null) {
+            return false;
+        }
+
+        // Only check current player if not in force mode
+        if (!forceMode && piece.getPlayer() != currentPlayer) {
+            return false;
+        }
+
+        return piece.isValidMove(from, to, board);
+    }
+
+    private void printBoard() {
+        System.out.println("\nCurrent board state:");
+        System.out.println("BLACK (lowercase pieces)");
+        for (int i = 7; i >= 0; i--) {
+            System.out.print((i + 1) + " ");
+            for (int j = 0; j < 8; j++) {
+                GamePiece piece = board.getPiece(new Position(j, i));
+                if (piece == null) {
+                    System.out.print(". ");
+                } else {
+                    char symbol = piece.getType().charAt(0);
+                    symbol = piece.getPlayer() == Player.WHITE ?
+                            Character.toUpperCase(symbol) :
+                            Character.toLowerCase(symbol);
+                    System.out.print(symbol + " ");
+                }
+            }
+            System.out.println();
+        }
+        System.out.println("  a b c d e f g h");
+        System.out.println("WHITE (uppercase pieces)");
+        System.out.println("Current turn: " + currentPlayer);
     }
 
     private boolean isValidMove(Position from, Position to) {
@@ -55,11 +106,15 @@ public class ChessGame {
     public void undo() {
         commandHistory.undo();
         switchPlayer();
+        System.out.println("Move undone!");
+        printBoard();
     }
 
     public void redo() {
         commandHistory.redo();
         switchPlayer();
+        System.out.println("Move redone!");
+        printBoard();
     }
 
     private void switchPlayer() {
