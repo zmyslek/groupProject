@@ -8,6 +8,7 @@ import input.MoveInput;
 import model.GamePiece;
 import model.Player;
 import model.Position;
+import factory.GamePieceFactory;
 
 public class ChessGame {
     private final GameBoard board;
@@ -37,6 +38,11 @@ public class ChessGame {
 
             MoveCommand moveCommand = new MoveCommand(board, from, to);
             commandHistory.execute(moveCommand);
+
+            // Check for pawn promotion after move
+            GamePiece movedPiece = board.getPiece(to);
+            checkForPromotion(to, movedPiece);
+
             if (!forceMode) {
                 switchPlayer();
             }
@@ -45,6 +51,17 @@ public class ChessGame {
 
         } catch (Exception e) {
             System.err.println("Error: " + e.getMessage());
+        }
+    }
+
+    private void checkForPromotion(Position to, GamePiece piece) {
+        if (piece != null && piece.getType().equals("Pawn")) {
+            int promotionRank = (piece.getPlayer() == Player.WHITE) ? 7 : 0;
+            if (to.getY() == promotionRank) {
+                GamePiece promotedPiece = GamePieceFactory.promotePiece(piece, "Queen");
+                board.setPiece(to, promotedPiece);
+                System.out.println("Pawn promoted to Queen!");
+            }
         }
     }
 
@@ -77,6 +94,10 @@ public class ChessGame {
                     System.out.print(". ");
                 } else {
                     char symbol = piece.getType().charAt(0);
+                    // Use 'N' for Knight to avoid confusion with King
+                    if (piece.getType().equals("Knight")) {
+                        symbol = 'N';
+                    }
                     symbol = piece.getPlayer() == Player.WHITE ?
                             Character.toUpperCase(symbol) :
                             Character.toLowerCase(symbol);
@@ -88,19 +109,6 @@ public class ChessGame {
         System.out.println("  a b c d e f g h");
         System.out.println("WHITE (uppercase pieces)");
         System.out.println("Current turn: " + currentPlayer);
-    }
-
-    private boolean isValidMove(Position from, Position to) {
-        if (!board.isValidPosition(from) || !board.isValidPosition(to)) {
-            return false;
-        }
-
-        GamePiece piece = board.getPiece(from);
-        if (piece == null || piece.getPlayer() != currentPlayer) {
-            return false;
-        }
-
-        return piece.isValidMove(from, to, board);
     }
 
     public void undo() {
