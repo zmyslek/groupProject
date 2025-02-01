@@ -1,10 +1,12 @@
-public class GamePiece implements BoardComponent {
-  private String type; // e.g., "King", "Queen", "Pawn"
-  private String owner; // "Player 1" or "Player 2"
+public class GamePiece {
+  private String type;
+  private String owner;
+  private MoveStrategy moveStrategy;
 
-  public GamePiece(String type, String owner) {
+  public GamePiece(String type, String owner, MoveStrategy moveStrategy) {
     this.type = type;
     this.owner = owner;
+    this.moveStrategy = moveStrategy;
   }
 
   public String getType() {
@@ -15,18 +17,11 @@ public class GamePiece implements BoardComponent {
     return owner;
   }
 
-  @Override
-  public void display() {
-    System.out.print(type.charAt(0)); // Display the first letter (e.g., K for King)
+  public void move(Tile from, Tile to) {
+    moveStrategy.move(from, to);
   }
 
-  public boolean isValidMove(int startRow, int startCol, int endRow, int endCol, GameBoard board) {
-    if (type.equals("King")) {
-      if (Math.abs(startRow - endRow) <= 1 && Math.abs(startCol - endCol) <= 1) {
-        Tile targetTile = board.getTile(endRow, endCol);
-        return targetTile.isEmpty() || !targetTile.getPiece().getOwner().equals(this.owner);
-      }
-    }
-    return false;
+  public void display() {
+    System.out.print(type.charAt(0)); // Display first letter of type (e.g., "K" for King)
   }
 }

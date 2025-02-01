@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
 
-public class GameBoard implements Subject {
+public class GameBoard implements BoardComponent, Subject {
   private static GameBoard instance;
   private Tile[][] board;
   private List<Observer> observers;
@@ -80,5 +80,10 @@ public class GameBoard implements Subject {
     for (Observer observer : observers) {
       observer.update(message);
     }
+  }
+
+  @Override
+  public void display() {
+    printBoard();
   }
 }

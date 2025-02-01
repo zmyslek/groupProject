@@ -1,4 +1,4 @@
-public class Tile {
+public class Tile implements BoardComponent {
   private GamePiece piece;
 
   public boolean isEmpty() {
@@ -17,6 +17,7 @@ public class Tile {
     return piece;
   }
 
+  @Override
   public void display() {
     if (piece == null) {
       System.out.print("- ");
